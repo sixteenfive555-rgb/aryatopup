@@ -1,0 +1,113 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ARYA STORE - Top Up Game</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0b0712;color:white;font-family:Arial,sans-serif}
+header{padding:24px 16px;background:linear-gradient(135deg,#6500c8,#f00085);text-align:center}
+header h1{margin:0;font-size:30px}
+header p{margin-bottom:0}
+main{max-width:850px;margin:auto;padding:18px}
+h2{color:#ff67c4}
+.tabs{display:flex;gap:10px}
+button,select,input{font:inherit}
+.tabs button,.buy{border:0;border-radius:10px;padding:12px;background:#a329ff;color:white;font-weight:bold}
+.tabs button{flex:1}
+.products{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
+.product{background:#191222;border:1px solid #49305e;border-radius:14px;padding:14px}
+.product b{display:block;margin-bottom:10px}
+.price{color:#ff79c9;font-weight:bold;margin-bottom:12px}
+.buy{width:100%;cursor:pointer}
+form{background:#191222;padding:16px;border-radius:14px;margin-top:24px}
+label{display:block;margin-top:12px}
+input,select{width:100%;padding:12px;border-radius:8px;border:1px solid #57436a;background:#0d0914;color:white;margin-top:6px}
+.qris{width:100%;max-width:340px;display:block;margin:12px auto;border-radius:12px}
+.note{color:#c6b8d5;font-size:13px;line-height:1.6}
+footer{text-align:center;padding:24px;color:#b9a9c9}
+@media(max-width:400px){.products{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+<h1>💎 ARYA STORE</h1>
+<p>Top Up Free Fire & Mobile Legends</p>
+</header>
+<main>
+<h2>Pilih Game</h2>
+<div class="tabs">
+<button type="button" onclick="game('ff')">🔥 Free Fire</button>
+<button type="button" onclick="game('ml')">⚔️ Mobile Legends</button>
+</div>
+<h2 id="heading">Diamond Free Fire</h2>
+<div class="products" id="products"></div>
+
+<form id="order">
+<h2>Detail Pesanan</h2>
+<label>Game
+<select id="game" onchange="render()">
+<option value="ff">Free Fire</option>
+<option value="ml">Mobile Legends</option>
+</select></label>
+<label>ID Pemain
+<input id="player" required placeholder="Masukkan ID game"></label>
+<label>Server (ML jika diperlukan)
+<input id="server" placeholder="Contoh: 1234"></label>
+<label>Nomor WhatsApp pembeli
+<input id="buyer" required inputmode="tel" placeholder="08xxxxxxxxxx"></label>
+<label>Paket dipilih
+<select id="package" required onchange="total()"></select></label>
+<p>Total: <strong id="total" style="color:#ff79c9">Pilih paket</strong></p>
+<button class="buy" type="submit">Pesan & Konfirmasi WhatsApp</button>
+</form>
+
+<section>
+<h2>Pembayaran QRIS</h2>
+<p class="note">Setelah mengirim pesanan ke admin, minta konfirmasi total pembayaran. Scan QRIS resmi ARYA STORE di bawah dan pastikan nama penerima benar sebelum membayar.</p>
+<img class="qris" src="qris-arya-store.jpg" alt="QRIS ARYA STORE" onerror="this.style.display='none';document.getElementById('qmsg').style.display='block'">
+<p id="qmsg" class="note">Gambar QRIS belum tersedia. Upload gambar QRIS asli dengan nama <b>qris-arya-store.jpg</b> ke repository yang sama.</p>
+<p class="note">Simpan bukti pembayaran dan kirim ke admin WhatsApp.</p>
+</section>
+</main>
+<footer>© ARYA STORE • Top Up Game</footer>
+<script>
+const data={
+ff:[
+["5 Diamonds",1000],["10 Diamonds",2000],["12 Diamonds",2200],
+["20 Diamonds",4000],["25 Diamonds",5000],["30 Diamonds",6000],
+["50 Diamonds",8000],["70 Diamonds",10000],["100 Diamonds",17600],
+["140 Diamonds",20000],["355 Diamonds",50000],["500 Diamonds",71000],
+["720 Diamonds",100000]
+],
+ml:[
+["5 Diamonds",1500],["12 Diamonds",3500],["19 Diamonds",6500],
+["28 Diamonds",10000],["44 Diamonds",15000],["59 Diamonds",20000],
+["85 Diamonds",29000],["110 Diamonds",37000],["170 Diamonds",57000],
+["240 Diamonds",80000],["296 Diamonds",99000],["370 Diamonds",125000],
+["568 Diamonds",186000],["720 Diamonds",235000]
+]};
+let current="ff";
+function game(g){current=g;document.getElementById("game").value=g;render();document.getElementById("heading").scrollIntoView({behavior:"smooth"})}
+function rupiah(n){return "Rp"+n.toLocaleString("id-ID")}
+function render(){
+current=document.getElementById("game").value;
+document.getElementById("heading").textContent=current==="ff"?"Diamond Free Fire":"Diamond Mobile Legends";
+document.getElementById("products").innerHTML=data[current].map((p,i)=>`<div class="product"><b>💎 ${p[0]}</b><div class="price">${rupiah(p[1])}</div><button class="buy" type="button" onclick="choose(${i})">Pilih Paket</button></div>`).join("");
+document.getElementById("package").innerHTML=data[current].map((p,i)=>`<option value="${i}">${p[0]} — ${rupiah(p[1])}</option>`).join("");
+total();
+}
+function choose(i){document.getElementById("package").value=i;total();document.getElementById("order").scrollIntoView({behavior:"smooth"})}
+function total(){let p=data[current][+document.getElementById("package").value];document.getElementById("total").textContent=p?rupiah(p[1]):"-"}
+document.getElementById("order").addEventListener("submit",function(e){
+e.preventDefault();
+const p=data[current][+document.getElementById("package").value];
+const msg=`HALO ARYA STORE, SAYA MAU TOP UP%0AGame: ${current==="ff"?"Free Fire":"Mobile Legends"}%0AID Pemain: ${document.getElementById("player").value}%0AServer: ${document.getElementById("server").value||"-"}%0APaket: ${p[0]}%0ATotal: ${rupiah(p[1])}%0AWhatsApp pembeli: ${document.getElementById("buyer").value}%0AMohon konfirmasi pesanan dan pembayaran QRIS.`;
+window.open("https://wa.me/6283892254834?text="+msg,"_blank");
+});
+render();
+</script>
+</body>
+</html>
